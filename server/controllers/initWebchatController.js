@@ -6,7 +6,7 @@ const { logFinalAction, logInitialAction, logInterimAction } = require("../helpe
 
 const contactWebchatOrchestrator = async (request, customerFriendlyName) => {
     logInterimAction("Calling Webchat Orchestrator");
-    console.log('request.body?.formData', request.body?.formData);
+
     const params = new URLSearchParams();
     params.append("AddressSid", process.env.ADDRESS_SID);
     params.append("ChatFriendlyName", "Webchat widget");
@@ -15,7 +15,6 @@ const contactWebchatOrchestrator = async (request, customerFriendlyName) => {
         "PreEngagementData",
         JSON.stringify({
             ...request.body?.formData,
-            query: `${request.body?.formData.phone}: ${request.body?.formData.query}`,
             friendlyName: customerFriendlyName
         })
     );
@@ -31,7 +30,6 @@ const contactWebchatOrchestrator = async (request, customerFriendlyName) => {
             }
         });
         ({ identity, conversation_sid: conversationSid } = res.data);
-        // identity = request.body?.formData.phone;
     } catch (e) {
         logInterimAction("Something went wrong during the orchestration:", e.response?.data?.message);
         throw e.response.data;
@@ -46,13 +44,12 @@ const contactWebchatOrchestrator = async (request, customerFriendlyName) => {
 };
 
 const sendUserMessage = (conversationSid, identity, messageBody) => {
-    console.log("Sending user message from", identity);
+    logInterimAction("Sending user message");
     return getTwilioClient()
         .conversations.conversations(conversationSid)
         .messages.create({
             body: messageBody,
             author: identity,
-            addressRetention: 'retain',
             xTwilioWebhookEnabled: true // trigger webhook
         })
         .then(() => {
@@ -64,11 +61,10 @@ const sendUserMessage = (conversationSid, identity, messageBody) => {
 };
 
 const sendWelcomeMessage = (conversationSid, customerFriendlyName) => {
-    console.log("Sending welcome message");
+    logInterimAction("Sending welcome message");
     return getTwilioClient()
         .conversations.conversations(conversationSid)
         .messages.create({
-            addressRetention: 'retain',
             body: `Welcome ${customerFriendlyName}! An agent will be with you in just a moment.`,
             author: "Concierge"
         })
@@ -102,8 +98,7 @@ const initWebchatController = async (request, response) => {
     // OPTIONAL — if user query is defined
     if (request.body?.formData?.query) {
         // use it to send a message in behalf of the user with the query as body
-        console.log('identity', identity);
-        sendUserMessage(conversationSid, request.body.formData.phone, `${request.body.formData.phone}: ${request.body.formData.query}`).then(() =>
+        sendUserMessage(conversationSid, identity, request.body.formData.query).then(() =>
             // and then send another message from Concierge, letting the user know that an agent will help them soon
             sendWelcomeMessage(conversationSid, customerFriendlyName)
         );

@@ -105,12 +105,9 @@ export const acceptReservation = async ({ conversationSid }: { conversationSid: 
 export const sendMessage = async ({ conversationSid, messageText }) => {
     const client = await getTwilioClient();
     const worker = await getWorker();
-    const msg = { author: worker.friendlyName, body: messageText };
-    // eslint-disable-next-line prettier/prettier
-    msg['addressRetention'] = "retain";
     const message = await client.conversations
         .conversations(conversationSid)
-        .messages.create(msg);
+        .messages.create({ author: worker.friendlyName, body: messageText });
     console.log(`Message ${message.sid} sent by Agent: ${worker.friendlyName}`);
     return "The message has been sent by Agent";
 };
