@@ -61,6 +61,7 @@ export const MessageInput = () => {
 
         let preparedMessage = conversation.prepareMessage();
         preparedMessage = preparedMessage.setBody(text);
+        preparedMessage.setAttributes({foo: 'bar'})
         attachedFiles.forEach((file: File) => {
             const formData = new FormData();
             formData.append(file.name, file);
