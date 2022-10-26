@@ -26,14 +26,18 @@ const initWebchat = async (config: ConfigState) => {
     sessionDataHandler.setEndpoint(mergedConfig.serverUrl);
     store.dispatch(initConfig(mergedConfig));
     initLogger();
+    const chatAvailableResponse = await fetch(`${mergedConfig.serverUrl}/chatAvailable`).then(async (res) => res.json());
     const rootElement = document.getElementById("twilio-webchat-widget-root");
-
-    render(
-        <Provider store={store}>
-            <WebchatWidget />
-        </Provider>,
-        rootElement
-    );
+    if (chatAvailableResponse.chatAvailable) {
+        render(
+            <Provider store={store}>
+                <WebchatWidget />
+            </Provider>,
+            rootElement
+        );
+    } else {
+        render(<></>, rootElement);
+    }
 };
 
 declare global {
