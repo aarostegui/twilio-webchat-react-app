@@ -26,6 +26,7 @@ const initWebchat = async (config: ConfigState) => {
     sessionDataHandler.setEndpoint(mergedConfig.serverUrl);
     store.dispatch(initConfig(mergedConfig));
     initLogger();
+    
     const chatAvailableResponse = await fetch(`${mergedConfig.serverUrl}/chatAvailable`).then(async (res) => res.json());
     const rootElement = document.getElementById("twilio-webchat-widget-root");
     if (chatAvailableResponse.chatAvailable) {

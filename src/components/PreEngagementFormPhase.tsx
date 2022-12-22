@@ -17,7 +17,7 @@ import { NotificationBar } from "./NotificationBar";
 import { introStyles, fieldStyles, titleStyles, formStyles } from "./styles/PreEngagementFormPhase.styles";
 
 export const PreEngagementFormPhase = () => {
-    const { name, email, query } = useSelector((state: AppState) => state.session.preEngagementData) || {};
+    const { name, email, phone, query } = useSelector((state: AppState) => state.session.preEngagementData) || {};
     const dispatch = useDispatch();
 
     const handleSubmit = async (e: FormEvent) => {
@@ -28,6 +28,7 @@ export const PreEngagementFormPhase = () => {
                 formData: {
                     friendlyName: name,
                     email,
+                    phone,
                     query
                 }
             });
@@ -77,6 +78,18 @@ export const PreEngagementFormPhase = () => {
                         data-test="pre-engagement-chat-form-email-input"
                         value={email}
                         onChange={(e) => dispatch(updatePreEngagementData({ email: e.target.value }))}
+                        required
+                    />
+                </Box>
+                <Box {...fieldStyles}>
+                    <Label htmlFor="phone">Phone number</Label>
+                    <Input
+                        type="tel"
+                        placeholder="Please enter your phone number"
+                        name="phone"
+                        data-test="pre-engagement-chat-form-phone-input"
+                        value={phone}
+                        onChange={(e) => dispatch(updatePreEngagementData({ phone: e.target.value }))}
                         required
                     />
                 </Box>

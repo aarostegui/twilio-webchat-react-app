@@ -12,6 +12,7 @@ import {
 describe("Session Reducer", () => {
     const initialPreEngagementData: PreEngagementData = {
         email: "",
+        phone: "",
         name: "",
         query: ""
     };
