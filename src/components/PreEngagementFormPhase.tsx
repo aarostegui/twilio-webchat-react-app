@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Input } from "@twilio-paste/core/input";
 import { Label } from "@twilio-paste/core/label";
 import { Box } from "@twilio-paste/core/box";
@@ -6,6 +7,7 @@ import { FormEvent } from "react";
 import { Button } from "@twilio-paste/core/button";
 import { useDispatch, useSelector } from "react-redux";
 import { Text } from "@twilio-paste/core/text";
+import axios from "axios";
 
 import { sessionDataHandler } from "../sessionDataHandler";
 import { addNotification, changeEngagementPhase, updatePreEngagementData } from "../store/actions/genericActions";
@@ -43,6 +45,29 @@ export const PreEngagementFormPhase = () => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSubmit(e);
+        }
+    };
+
+    const callMeBack = async () => {
+        try {
+            const [first_name, last_name] = (name || "").split(" ");
+            const result = await axios({
+                method: "POST",
+                url: "https://0njqpqqbue.execute-api.us-east-1.amazonaws.com/prod/callmeback",
+                data: JSON.stringify({
+                    first_name,
+                    middle_name: "",
+                    last_name,
+                    email,
+                    phone,
+                    message: query
+                })
+            });
+            console.log('result.status', result.status);
+            sessionDataHandler.clear();
+            dispatch(changeEngagementPhase({ phase: EngagementPhase.MessagingCanvas }));
+        } catch (error) {
+            dispatch(addNotification(notifications.failedToInitSessionNotification("Couldn't call back")));
         }
     };
 
@@ -106,10 +131,21 @@ export const PreEngagementFormPhase = () => {
                         required
                     />
                 </Box>
-
-                <Button variant="primary" type="submit" data-test="pre-engagement-start-chat-button">
-                    Start chat
-                </Button>
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                    <Button variant="primary" type="submit" data-test="pre-engagement-start-chat-button">
+                        Start chat
+                    </Button>
+                    <div style={{ margin: 10}}><Label htmlFor="or">or</Label></div>
+                    <Button
+                        variant="primary"
+                        disabled={!query || !name || !phone}
+                        onClick={callMeBack}
+                        type="button"
+                        data-test="call-me-back"
+                    >
+                        Call me back
+                    </Button>
+                </div>
             </Box>
         </>
     );

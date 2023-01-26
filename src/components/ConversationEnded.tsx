@@ -18,13 +18,13 @@ export const ConversationEnded = () => {
     return (
         <Box {...containerStyles}>
             <Text as="h3" {...titleStyles}>
-                Thanks for chatting with us!
+                Thanks for contacting us!
             </Text>
             <Text as="p" {...textStyles}>
                 If you have any more questions, feel free to reach out again.
             </Text>
             <Button variant="primary" data-test="start-new-chat-button" onClick={handleClick}>
-                Start new chat
+                Start new chat or callback
             </Button>
         </Box>
     );
